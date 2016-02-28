@@ -1,4 +1,11 @@
-import cv2, os
+"""
+
+This is the test file, the slow one that has to rerender all the faces at startup.
+
+"""
+
+import os
+import cv2
 import numpy as np
 import dill
 import pickle
