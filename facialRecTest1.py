@@ -3,7 +3,7 @@
 Currently testing different things with the saving
 
 TODO:
--Clean up code (your naming conventions are horrendous)
+-Clean up code
 -Query all photos with two faces
 -Crop photos to face
 -Etc
@@ -15,6 +15,7 @@ import os
 import numpy as np
 from PIL import Image
 import json
+import glob
 
 #Things that make things work
 arguments = ['haarcascade_frontalface_default.xml']
@@ -33,22 +34,22 @@ idElement = 0
 
 # Learn faces from pictures in database
 for folder in os.walk('database'):
-    currentPerson = folder[0].split("\\")[-1]
+    currentPerson = folder[0].split('\\')[-1]
     if (currentPerson != 'database'):
         FACEID.append(idElement)
         FACEID.append(currentPerson)
-        print(folder[2])
-        for file in folder[2]:
-            image_pil = Image.open('database\\'+currentPerson+'\\'+file).convert('L')
-            image = np.array(image_pil, 'uint8')
-            faces = faceCascade.detectMultiScale(image)
-            if len(faces) == 1:
-                for (x, y, w, h) in faces:
-                    IMAGES.append(image[y: y + h, x: x + w])
-                    LABELS.append(idElement)
-            else:
-                print("Removed file")
-                os.remove('database\\'+currentPerson+'\\'+file)
+        for filetype in ['*.jpg', '*.png', '*.jpeg']:
+            for file in glob.glob(folder[0]+'\\'+filetype):
+                image_pil = Image.open(file).convert('L')
+                image = np.array(image_pil, 'uint8')
+                faces = faceCascade.detectMultiScale(image)
+                if len(faces) != 1:
+                    os.remove(file)
+                    print('Removed', file)
+                else:
+                    for (x, y, w, h) in faces:
+                        IMAGES.append(image[y: y + h, x: x + w])
+                        LABELS.append(idElement)
         idElement += 1
         print('Gathered files on: ' + currentPerson)
 
@@ -76,24 +77,18 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     #Detect faces in the image
-    faces = faceCascade.detectMultiScale(
-        gray, 
-        scaleFactor=1.1, 
-        minNeighbors=5, 
-        minSize=(30, 30), 
-        #flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-    )
+    faces = faceCascade.detectMultiScale (gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        #cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         #See if there's anyone we recognize in the rectangle
         recognize_image_pil = Image.fromarray(frame).convert('L')#.crop((x, y, x+w, y+h))#.convert('L')
         recognize_image = np.array(recognize_image_pil, 'uint8')
 
         person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])#, confidence
-        cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y), 1, 1, 1)
+        cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y), 1, 1, (255, 255, 255))
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
