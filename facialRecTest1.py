@@ -1,15 +1,14 @@
 """
 
-Currently testing different things with the saving
-
 TODO:
 -Clean up code
--Query all photos with two faces
 -Crop photos to face
--Etc
+-Saving/loading
 
 """
 
+
+# Import the juicy stuff
 import cv2
 import os
 import numpy as np
@@ -17,61 +16,57 @@ from PIL import Image
 import json
 import glob
 
-#Things that make things work
-cascadepath = 'haarcascade_frontalface_default.xml'
+
+# Define lists and variables
 IMAGES = []
 LABELS = []
 FACEID = []
-idElement = 0
 
-faceCascade = cv2.CascadeClassifier(cascadepath)
+cascadepath = 'haarcascade_frontalface_default.xml'
 
-#Creates the face recogniser
+facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
-idElement = 0
+
 
 # Learn faces from pictures in database
+i = 0
 for folder in os.walk('database'):
     currentPerson = folder[0].split('\\')[-1]
     if (currentPerson != 'database'):
-        FACEID.append(idElement)
+        FACEID.append(i)
         FACEID.append(currentPerson)
         for filetype in ['*.jpg', '*.png', '*.jpeg']:
             for file in glob.glob(folder[0]+'\\'+filetype):
                 image_pil = Image.open(file).convert('L')
                 image = np.array(image_pil, 'uint8')
-                faces = faceCascade.detectMultiScale(image)
+                faces = facecascade.detectMultiScale(image)
                 if len(faces) != 1:
                     os.remove(file)
                     print('Removed', file)
                 else:
                     for (x, y, w, h) in faces:
                         IMAGES.append(image[y: y + h, x: x + w])
-                        LABELS.append(idElement)
-        idElement += 1
+                        LABELS.append(i)
+        i += 1
         print('Gathered files on: ' + currentPerson)
 
-#Trains the recognizer
+# Train the recognizer
 recognizer.train(IMAGES, np.array(LABELS))
 
-#Get the video thingy
-video_capture = cv2.VideoCapture(0)
+# Get video from webcam and run live face detection
+video = cv2.VideoCapture(0)
+mainloop = True
 
-while True:
-    # Capture frame-by-frame
-    ret, frame = video_capture.read()
+while mainloop:
+    ret, frame = video.read()
 
-    #Make it all gray
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    #Detect faces in the image
-    faces = faceCascade.detectMultiScale (gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    faces = facecascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
         #cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-        #See if there's anyone we recognize in the rectangle
         recognize_image_pil = Image.fromarray(frame).convert('L')#.crop((x, y, x+w, y+h))#.convert('L')
         recognize_image = np.array(recognize_image_pil, 'uint8')
 
@@ -81,12 +76,10 @@ while True:
     # Display the resulting frame
     cv2.imshow('Video', frame)
 
-    #Exit the script if the 'q' key is pressed
+    # Exit if 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        mainloop = False
 
-
-
-# When everything is done, release the capture
-video_capture.release()
+# Exit code
+video.release()
 cv2.destroyAllWindows()
