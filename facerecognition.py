@@ -54,7 +54,7 @@ recognizer.train(IMAGES, np.array(LABELS))
 
 
 # Get video from webcam and run live face detection
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(1) # USB Cam = 0; Laptop Cam = 1;
 mainloop = True
 
 while mainloop:
