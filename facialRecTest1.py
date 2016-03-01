@@ -18,15 +18,13 @@ import json
 import glob
 
 #Things that make things work
-arguments = ['haarcascade_frontalface_default.xml']
+cascadepath = 'haarcascade_frontalface_default.xml'
 IMAGES = []
 LABELS = []
 FACEID = []
 idElement = 0
 
-# Get user supplied values
-cascPath = arguments[0]
-faceCascade = cv2.CascadeClassifier(cascPath)
+faceCascade = cv2.CascadeClassifier(cascadepath)
 
 #Creates the face recogniser
 recognizer = cv2.face.createLBPHFaceRecognizer()
@@ -56,18 +54,8 @@ for folder in os.walk('database'):
 #Trains the recognizer
 recognizer.train(IMAGES, np.array(LABELS))
 
-#Things that make things work
-arguments = ['haarcascade_frontalface_default.xml']
-
-# Get user supplied values
-cascPath = arguments[0]
-faceCascade = cv2.CascadeClassifier(cascPath)
-
 #Get the video thingy
 video_capture = cv2.VideoCapture(0)
-
-# Create the haar cascade
-faceCascade = cv2.CascadeClassifier(cascPath)
 
 while True:
     # Capture frame-by-frame
