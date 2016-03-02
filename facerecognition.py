@@ -13,48 +13,34 @@ import cv2
 import os
 import numpy as np
 from PIL import Image
-import json
-import glob
+from sys import exit
 
 
 # Define lists and variables
-IMAGES = []
-LABELS = []
 FACEID = []
 
 cascadepath = 'haarcascade.xml'
-
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
 
-# Learn faces from pictures in database
+# Load faces
 i = 0
 for folder in os.walk('database'):
     currentPerson = folder[0].split('\\')[-1]
     if (currentPerson != 'database'):
         FACEID.append(i)
         FACEID.append(currentPerson)
-        for filetype in ['*.jpg', '*.png', '*.jpeg']:
-            for file in glob.glob(folder[0]+'\\'+filetype):
-                image_pil = Image.open(file).convert('L')
-                image = np.array(image_pil, 'uint8')
-                faces = facecascade.detectMultiScale(image)
-                if len(faces) != 1:
-                    os.remove(file)
-                    print('Removed', file)
-                else:
-                    for (x, y, w, h) in faces:
-                        IMAGES.append(image[y: y + h, x: x + w])
-                        LABELS.append(i)
         i += 1
-        print('Gathered files on: ' + currentPerson)
-
-recognizer.train(IMAGES, np.array(LABELS))
+try:
+    recognizer.load('facesavetest.yaml')
+except:
+    print("\nFile 'facesavetest.yaml' cannot be found.\n")
+    raise SystemExit
 
 
 # Get video from webcam and run live face detection
-video = cv2.VideoCapture(1) # USB Cam = 0; Laptop Cam = 1;
+video = cv2.VideoCapture(0) # USB Cam = 0; Laptop Cam = 1;
 mainloop = True
 
 while mainloop:
