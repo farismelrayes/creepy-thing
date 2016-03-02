@@ -1,9 +1,11 @@
+## Filename: updatefacemaps.py
 # Import the juicy stuff
 import cv2
 import os
 import numpy as np
 from PIL import Image
 from glob import glob
+
 
 # Define lists and variables
 IMAGES = []
@@ -14,6 +16,7 @@ cascadepath = 'haarcascade.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
+
 # Learn faces from pictures in database
 i = 0
 for folder in os.walk('database'):
@@ -21,7 +24,7 @@ for folder in os.walk('database'):
     if (currentPerson != 'database'):
         FACEID.append(i)
         FACEID.append(currentPerson)
-        print("Scanning " + currentPerson)
+        print("Scanning " + currentPerson + "...")
         for filetype in ['*.jpg', '*.png', '*.jpeg']:
             for file in glob(folder[0]+'\\'+filetype):
                 image_pil = Image.open(file).convert('L')
@@ -36,9 +39,10 @@ for folder in os.walk('database'):
                         LABELS.append(i)
         i += 1
 
-print("Training system...")
+print("\nTraining system...")
 recognizer.train(IMAGES, np.array(LABELS))
 
-# Save faces
 print("Saving data...")
 recognizer.save('facesavetest.yaml')
+
+print("\nDONE\n")

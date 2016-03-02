@@ -1,13 +1,4 @@
-"""
-
-TODO:
--Clean up code
--Crop photos to face
--Saving/loading
-
-"""
-
-
+## Filename: facerecognition.py
 # Import the juicy stuff
 import cv2
 import os
@@ -24,7 +15,7 @@ facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
 
-# Load faces
+# Load faces from database
 i = 0
 for folder in os.walk('database'):
     currentPerson = folder[0].split('\\')[-1]
@@ -39,7 +30,7 @@ except:
     raise SystemExit
 
 
-# Get video from webcam and run live face detection
+# Get video from webcam and run live face detection         TODO: Clean this code
 video = cv2.VideoCapture(0) # USB Cam = 0; Laptop Cam = 1;
 mainloop = True
 
@@ -51,7 +42,7 @@ while mainloop:
 
     # Draw onto the video
     for (x, y, w, h) in faces:
-        #cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
 
         recognize_image_pil = Image.fromarray(frame).convert('L')#.crop((x, y, x+w, y+h))#.convert('L')
         recognize_image = np.array(recognize_image_pil, 'uint8')
