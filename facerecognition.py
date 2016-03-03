@@ -3,6 +3,8 @@
 import cv2
 import os
 import numpy as np
+from time import strftime
+from datetime import datetime
 from PIL import Image
 from sys import exit
 from glob import glob
@@ -19,22 +21,41 @@ recognizer = cv2.face.createLBPHFaceRecognizer()
 
 
 # Crop photo into faces
-def facecrop(image):
-    facedata = "haarcascade.xml"
-    cascade = cv2.CascadeClassifier(facedata)
-
+def facecrop(image, remove):
     img = cv2.imread(image)
+    pth = '\\'.join(image.split('\\')[:-1])
+    fnm = image.split('\\')[-1]
 
-    minisize = (img.shape[1], img.shape[0])
-    miniframe = cv2.resize(img, minisize)
-    faces = cascade.detectMultiScale(miniframe)
+    if 'facecrop_' not in fnm:
+        facedata = "haarcascade.xml"
+        cascade = cv2.CascadeClassifier(facedata)
+        minisize = (img.shape[1], img.shape[0])
+        miniframe = cv2.resize(img, minisize)
+        faces = cascade.detectMultiScale(miniframe)
 
-    for f in faces:
-        x, y, w, h = [v for v in f]
+        for f in faces:
+            x, y, w, h = [v for v in f]
+            subface = img[max(y-8,0):y+h+8, max(x-8,0):x+w+8]
+            phototime = datetime.now()
+            face_file_name = "facecrop_" + str(y) + phototime.strftime('_%Y%m%d_%H%M%S') + ".jpg"
+            if len(pth) > 0:
+                cv2.imwrite(pth + '\\' + face_file_name, subface)
+            else:
+                cv2.imwrite(face_file_name, subface)
 
-        subface = img[max(y-8,0):y+h+8, max(x-8,0):x+w+8]
-        face_file_name = "faces/face_" + str(y) + ".jpg"
-        cv2.imwrite(face_file_name, subface)
+        if remove == True:
+            os.remove(image)
+
+        return True
+    return False
+
+# Crop all photos in database
+def cropdatabase():
+    for folder in os.walk('database'):
+        for filetype in ['*.jpg', '*.png', '*.jpeg']:
+            for file in glob(folder[0]+'\\'+filetype):
+                if facecrop(file, True):
+                    print(file)
 
 # Learn faces from pictures, save to file
 def updatedatabase(filename):
@@ -70,11 +91,12 @@ def getdatabase(filename):
             FACEID.append(i)
             FACEID.append(currentPerson)
             i += 1
-    recognizer.load(filname)
+    recognizer.load(filename)
 
 # Live video face recognition
 def videoloop():
     video = cv2.VideoCapture(0) # USB Cam = 0; Laptop Cam = 1;
+
     while 1:
         ret, frame = video.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -84,7 +106,7 @@ def videoloop():
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
             recognize_image_pil = Image.fromarray(frame).convert('L')#.crop((x, y, x+w, y+h))#.convert('L')
             recognize_image = np.array(recognize_image_pil, 'uint8')
-            person_predicted, confidence = recognizer.predict(recognize_image[y: y + h, x: x + w])#, confidence
+            person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])#, confidence
             cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y-8), 1, 1, (255, 255, 255))
 
         cv2.imshow('Video', frame)
@@ -98,5 +120,8 @@ def videoloop():
 
 
 if __name__ == '__main__':
-    getdatabase('facesavetest.yaml')
-    videoloop()
+    facecrop('people.jpg', False)
+    #cropdatabase()
+    #updatedatabase('facesavetest.yaml')
+    #getdatabase('facesavetest.yaml')
+    #videoloop()
