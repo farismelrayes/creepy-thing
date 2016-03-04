@@ -62,7 +62,7 @@ def updatedatabase(filename):
     i = 0
     for folder in os.walk('database'):
         currentPerson = folder[0].split('\\')[-1]
-        if (currentPerson != 'database'):
+        if currentPerson != 'database' and currentPerson != 'unsorted':
             FACEID.append(i)
             FACEID.append(currentPerson)
             print("Scanning " + currentPerson + "...")
@@ -87,15 +87,15 @@ def getdatabase(filename):
     i = 0
     for folder in os.walk('database'):
         currentPerson = folder[0].split('\\')[-1]
-        if (currentPerson != 'database'):
+        if currentPerson != 'database' and currentPerson != 'unsorted':
             FACEID.append(i)
             FACEID.append(currentPerson)
             i += 1
     recognizer.load(filename)
 
 # Live video face recognition
-def videoloop():
-    video = cv2.VideoCapture(0) # USB Cam = 0; Laptop Cam = 1;
+def videoloop(camera):
+    video = cv2.VideoCapture(camera) # USB Cam = 0; Laptop Cam = 1;
 
     while 1:
         ret, frame = video.read()
@@ -123,6 +123,6 @@ if __name__ == '__main__':
     #facecrop('people.jpg', False)
     #cropfolder('hackathon')
     updatedatabase('facesavetest.yaml')
-    getdatabase('facesavetest.yaml')
-    videoloop()
+    #getdatabase('facesavetest.yaml')
+    videoloop(0)
     print("Done")
