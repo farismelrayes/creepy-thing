@@ -50,8 +50,8 @@ def facecrop(image, remove):
     return False
 
 # Crop all photos in database
-def cropdatabase():
-    for folder in os.walk('database'):
+def cropfolder(folder):
+    for folder in os.walk(folder):
         for filetype in ['*.jpg', '*.png', '*.jpeg']:
             for file in glob(folder[0]+'\\'+filetype):
                 if facecrop(file, True):
@@ -120,8 +120,9 @@ def videoloop():
 
 
 if __name__ == '__main__':
-    facecrop('people.jpg', False)
-    #cropdatabase()
-    #updatedatabase('facesavetest.yaml')
-    #getdatabase('facesavetest.yaml')
-    #videoloop()
+    #facecrop('people.jpg', False)
+    #cropfolder('hackathon')
+    updatedatabase('facesavetest.yaml')
+    getdatabase('facesavetest.yaml')
+    videoloop()
+    print("Done")
