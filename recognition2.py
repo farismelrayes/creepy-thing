@@ -19,6 +19,22 @@ cascadepath = 'haarcascade.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
+def detectCameras():
+    '''   This function detects the number of cameras connected to the device, returns it as a numerical value
+        Be sure to print the value returned by the function :)     '''
+    number = 0
+    while True:
+        cap = cv2.VideoCapture()
+        cap.open(number)
+        if cap.isOpened() == False:
+            break
+        else:
+            number+=1
+            cap.release()
+
+
+    return number
+
 
 # Crop photo into faces
 def facecrop(image, remove):
