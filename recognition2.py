@@ -19,25 +19,22 @@ cascadepath = 'haarcascade.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
-def detectCameras():
-    '''   This function detects the number of cameras connected to the device, returns it as a numerical value
-        Be sure to print the value returned by the function :)     '''
-    number = 0
+
+# Detects number of cameras connected, returns int
+def detect_cameras():
+    num = 0
     while True:
         cap = cv2.VideoCapture()
-        cap.open(number)
+        cap.open(num)
         if cap.isOpened() == False:
             break
         else:
-            number+=1
+            num += 1
             cap.release()
-
-
     return number
 
-
 # Crop photo into faces
-def facecrop(image, remove):
+def face_crop(image, remove):
     img = cv2.imread(image)
     pth = '\\'.join(image.split('\\')[:-1])
     fnm = image.split('\\')[-1]
@@ -66,22 +63,22 @@ def facecrop(image, remove):
     return False
 
 # Crop all photos in database
-def cropfolder(folder):
+def crop_folder(folder):
     for folder in os.walk(folder):
         for filetype in ['*.jpg', '*.png', '*.jpeg']:
             for file in glob(folder[0]+'\\'+filetype):
-                if facecrop(file, True):
+                if face_crop(file, True):
                     print(file)
 
 # Learn faces from pictures, save to file
-def updatedatabase(filename):
+def update_database(filename):
     i = 0
     for folder in os.walk('database'):
-        currentPerson = folder[0].split('\\')[-1]
-        if currentPerson != 'database' and currentPerson != 'unsorted':
+        currentperson = folder[0].split('\\')[-1]
+        if currentperson != 'database' and currentperson != 'unsorted':
             FACEID.append(i)
-            FACEID.append(currentPerson)
-            print("Scanning " + currentPerson + "...")
+            FACEID.append(currentperson)
+            print("Scanning " + currentperson + "...")
             for filetype in ['*.jpg', '*.png', '*.jpeg']:
                 for file in glob(folder[0]+'\\'+filetype):
                     image_pil = Image.open(file).convert('L')
@@ -99,21 +96,21 @@ def updatedatabase(filename):
     recognizer.save(filename)
 
 # Load faces from file
-def getdatabase(filename):
+def get_database(filename):
     i = 0
     for folder in os.walk('database'):
-        currentPerson = folder[0].split('\\')[-1]
-        if currentPerson != 'database' and currentPerson != 'unsorted':
+        currentperson = folder[0].split('\\')[-1]
+        if currentperson != 'database' and currentperson != 'unsorted':
             FACEID.append(i)
-            FACEID.append(currentPerson)
+            FACEID.append(currentperson)
             i += 1
     recognizer.load(filename)
 
 # Live video face recognition
-def videoloop(camera):
+def video_loop(camera):
     video = cv2.VideoCapture(camera) # USB Cam = 0; Laptop Cam = 1;
 
-    while 1:
+    while True:
         ret, frame = video.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = facecascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
@@ -136,9 +133,9 @@ def videoloop(camera):
 
 
 if __name__ == '__main__':
-    #facecrop('people.jpg', False)
-    #cropfolder('hackathon')
-    updatedatabase('facesavetest.yaml')
-    #getdatabase('facesavetest.yaml')
-    videoloop(0)
+    #face_crop('people.jpg', False)
+    #crop_folder('hackathon')
+    update_database('facesavetest.yaml')
+    #get_database('facesavetest.yaml')
+    video_loop(0)
     print("Done")
