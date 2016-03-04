@@ -134,8 +134,8 @@ def video_loop(camera):
 
 if __name__ == '__main__':
     #face_crop('people.jpg', False)
-    #crop_folder('hackathon')
-    update_database('facesavetest.yaml')
-    #get_database('facesavetest.yaml')
+    #crop_folder('cropping')
+    #update_database('faces_20160403.yaml')
+    get_database('faces_20160403.yaml')
     video_loop(0)
     print("Done")
