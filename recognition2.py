@@ -73,9 +73,9 @@ def crop_folder(folder):
 # Learn faces from pictures, save to file
 def update_database(filename):
     i = 0
-    for folder in os.walk('database'):
+    for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
-        if currentperson != 'database' and currentperson != 'unsorted':
+        if currentperson != 'facedata' and currentperson != 'unsorted':
             FACEID.append(i)
             FACEID.append(currentperson)
             print("Scanning " + currentperson + "...")
@@ -98,9 +98,9 @@ def update_database(filename):
 # Load faces from file
 def get_database(filename):
     i = 0
-    for folder in os.walk('database'):
+    for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
-        if currentperson != 'database' and currentperson != 'unsorted':
+        if currentperson != 'facedata' and currentperson != 'unsorted':
             FACEID.append(i)
             FACEID.append(currentperson)
             i += 1
