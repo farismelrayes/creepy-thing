@@ -1,4 +1,5 @@
 ## Filename: facerecognition.py
+
 # Import the juicy stuff
 import cv2
 import os
@@ -10,7 +11,7 @@ from sys import exit
 from glob import glob
 
 
-# Define lists and variables
+# Initialise variables
 IMAGES = []
 LABELS = []
 FACEID = []
@@ -20,8 +21,11 @@ facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer()
 
 
-# Detects number of cameras connected, returns int
+# Define functions
 def camera_count():
+    """
+    :description: finds the number of cameras connected
+    """
     num = 0
     while True:
         cap = cv2.VideoCapture()
@@ -33,8 +37,10 @@ def camera_count():
             cap.release()
     return num
 
-# Seek camera ids
 def camera_seek():
+    """
+    :description: seeks the id of connected camera
+    """
     test = True
     if camera_count() < 1:
         print("No cameras connected")
@@ -46,12 +52,15 @@ def camera_seek():
                 video_loop(x)
                 test = False
             except Exception:
-                x+=1
+                x += 1
         if x > 255:
             print("No cameras in range")
+    return x
 
-# Crop photo into faces
 def face_crop(image, remove):
+    """
+    :description: crops photo into images of individual faces
+    """
     img = cv2.imread(image)
     pth = '\\'.join(image.split('\\')[:-1])
     fnm = image.split('\\')[-1]
@@ -79,16 +88,20 @@ def face_crop(image, remove):
         return True
     return False
 
-# Crop all photos in database
 def crop_folder(folder):
+    """
+    :description: walks through folder and crops all photos to faces
+    """
     for folder in os.walk(folder):
         for filetype in ['*.jpg', '*.png', '*.jpeg']:
             for file in glob(folder[0]+'\\'+filetype):
                 if face_crop(file, True):
                     print(file)
 
-# Learn faces from pictures, save to file
 def update_database(filename):
+    """
+    :description: learn faces from pictures and save them to a file
+    """
     i = 0
     for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
@@ -112,8 +125,10 @@ def update_database(filename):
     recognizer.train(IMAGES, np.array(LABELS))
     recognizer.save(filename)
 
-# Load faces from file
 def get_database(filename):
+    """
+    :description: load faces from file
+    """
     i = 0
     for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
@@ -123,9 +138,11 @@ def get_database(filename):
             i += 1
     recognizer.load(filename)
 
-# Live video face recognition
 def video_loop(camera):
-    video = cv2.VideoCapture(camera) # USB Cam = 0; Laptop Cam = 1;
+    """
+    :description: run camera and look for faces
+    """
+    video = cv2.VideoCapture(camera)
 
     while True:
         ret, frame = video.read()
