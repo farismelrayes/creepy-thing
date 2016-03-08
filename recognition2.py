@@ -18,7 +18,7 @@ FACEID = []
 
 cascadepath = 'haarcascade.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
-recognizer = cv2.face.createLBPHFaceRecognizer()
+recognizer = cv2.face.createLBPHFaceRecognizer(grid_x=16, grid_y=16, threshold=1000)
 
 
 # Define functions
@@ -105,7 +105,7 @@ def update_database(filename):
     i = 0
     for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
-        if currentperson != 'facedata' and currentperson != 'unsorted':
+        if currentperson != 'facedata' and currentperson != 'Unsorted':
             FACEID.append(i)
             FACEID.append(currentperson)
             print("Scanning " + currentperson + "...")
@@ -133,7 +133,7 @@ def get_database(filename):
     i = 0
     for folder in os.walk('facedata'):
         currentperson = folder[0].split('\\')[-1]
-        if currentperson != 'facedata' and currentperson != 'unsorted':
+        if currentperson != 'facedata' and currentperson != 'Unsorted':
             FACEID.append(i)
             FACEID.append(currentperson)
             i += 1
@@ -149,12 +149,12 @@ def video_loop(camera):
     while True:
         ret, frame = video.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = facecascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        faces = facecascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(30, 30))
 
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
             recognize_image_pil = Image.fromarray(frame).convert('L')
-            recognize_image = np.array(recognize_image_pil, 'uint8')
+            recognize_image = np.asarray(recognize_image_pil, 'uint8')
             person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])
             cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y-8), 1, 1, (255, 255, 255))
 
@@ -169,7 +169,8 @@ def video_loop(camera):
 if __name__ == '__main__':
     #face_crop('people.jpg', False)
     #crop_folder('cropping')
-    #update_database('faces_20160403.yaml')
-    get_database('faces_20160403.yaml')
-    camera_seek()
+    phototime = datetime.now()
+    update_database('faces' + phototime.strftime('%Y%m%d') + '.yaml')
+    #get_database('faces_20160803.yaml')
+    video_loop(0)
     print("Done")
