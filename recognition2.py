@@ -21,7 +21,7 @@ recognizer = cv2.face.createLBPHFaceRecognizer()
 
 
 # Detects number of cameras connected, returns int
-def detect_cameras():
+def camera_count():
     num = 0
     while True:
         cap = cv2.VideoCapture()
@@ -32,6 +32,23 @@ def detect_cameras():
             num += 1
             cap.release()
     return num
+
+# Seek camera ids
+def camera_seek():
+    test = True
+    if camera_count() < 1:
+        print("No cameras connected")
+    else:
+        x = 0
+        while test and x < 256:
+            try:
+                print("Found camera with id: " + str(x))
+                video_loop(x)
+                test = False
+            except Exception:
+                x+=1
+        if x > 255:
+            print("No cameras in range")
 
 # Crop photo into faces
 def face_crop(image, remove):
@@ -129,28 +146,11 @@ def video_loop(camera):
     video.release()
     cv2.destroyAllWindows()
 
-def runtime():
-    test = True
-    if detect_cameras() < 1:
-        print("No Cameras Found")
-    else:
-        x = 0
-        while test and x < 16:
-            try:
-                print("Enabling Cameras")
-                video_loop(x)
-                test = False
-            except Exception:
-                x+=1
-        if x > 15:
-            print("Camera not found in the range")
-
-
 
 if __name__ == '__main__':
     #face_crop('people.jpg', False)
     #crop_folder('cropping')
     #update_database('faces_20160403.yaml')
     get_database('faces_20160403.yaml')
-    runtime()
+    camera_seek()
     print("Done")
