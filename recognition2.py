@@ -134,14 +134,16 @@ def runtime():
     if detect_cameras() < 1:
         print("No Cameras Found")
     else:
-        while test:
-            x=0
+        x = 0
+        while test and x < 16:
             try:
                 print("Enabling Cameras")
                 video_loop(x)
                 test = False
             except Exception:
                 x+=1
+        if x > 15:
+            print("Camera not found in the range")
 
 
 
