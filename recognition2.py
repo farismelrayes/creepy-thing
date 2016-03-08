@@ -31,7 +31,7 @@ def detect_cameras():
         else:
             num += 1
             cap.release()
-    return number
+    return num
 
 # Crop photo into faces
 def face_crop(image, remove):
@@ -129,6 +129,19 @@ def video_loop(camera):
     video.release()
     cv2.destroyAllWindows()
 
+def runtime():
+    test = True
+    if detect_cameras() < 1:
+        print("No Cameras Found")
+    else:
+        while test:
+            x=0
+            try:
+                print("Enabling Cameras")
+                video_loop(x)
+                test = False
+            except Exception:
+                x+=1
 
 
 
@@ -137,5 +150,5 @@ if __name__ == '__main__':
     #crop_folder('cropping')
     #update_database('faces_20160403.yaml')
     get_database('faces_20160403.yaml')
-    video_loop(0)
+    runtime()
     print("Done")
