@@ -128,6 +128,7 @@ def update_database(filename):
 def get_database(filename):
     """
     :description: load faces from file
+    :param filename: name of the file to load faces from
     """
     i = 0
     for folder in os.walk('facedata'):
@@ -141,6 +142,7 @@ def get_database(filename):
 def video_loop(camera):
     """
     :description: run camera and look for faces
+    :param camera: id of the camera to use
     """
     video = cv2.VideoCapture(camera)
 
@@ -151,9 +153,9 @@ def video_loop(camera):
 
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
-            recognize_image_pil = Image.fromarray(frame).convert('L')#.crop((x, y, x+w, y+h))#.convert('L')
+            recognize_image_pil = Image.fromarray(frame).convert('L')
             recognize_image = np.array(recognize_image_pil, 'uint8')
-            person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])#, confidence
+            person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])
             cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y-8), 1, 1, (255, 255, 255))
 
         cv2.imshow('Video', frame)
