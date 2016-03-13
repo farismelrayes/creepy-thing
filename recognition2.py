@@ -16,7 +16,7 @@ IMAGES = []
 LABELS = []
 FACEID = []
 
-cascadepath = 'haarcascade.xml'
+cascadepath = 'haarcascade_frontalface_alt.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer(grid_x=16, grid_y=16, threshold=1000)
 
@@ -66,11 +66,9 @@ def face_crop(image, remove):
     fnm = image.split('\\')[-1]
 
     if 'facecrop_' not in fnm:
-        facedata = "haarcascade.xml"
-        cascade = cv2.CascadeClassifier(facedata)
         minisize = (img.shape[1], img.shape[0])
         miniframe = cv2.resize(img, minisize)
-        faces = cascade.detectMultiScale(miniframe)
+        faces = facecascade.detectMultiScale(miniframe)
 
         for f in faces:
             x, y, w, h = [v for v in f]
@@ -170,7 +168,7 @@ if __name__ == '__main__':
     #face_crop('people.jpg', False)
     #crop_folder('cropping')
     phototime = datetime.now()
-    update_database('faces' + phototime.strftime('%Y%m%d') + '.yaml')
-    #get_database('faces_20160803.yaml')
+    update_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
+    #get_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
     video_loop(0)
     print("Done")
