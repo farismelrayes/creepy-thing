@@ -16,7 +16,7 @@ IMAGES = []
 LABELS = []
 FACEID = []
 
-cascadepath = 'haarcascade.xml'
+cascadepath = 'haarcascade_frontalface_alt.xml'
 facecascade = cv2.CascadeClassifier(cascadepath)
 recognizer = cv2.face.createLBPHFaceRecognizer(grid_x=16, grid_y=16, threshold=1000)
 
@@ -66,11 +66,9 @@ def face_crop(image, remove):
     fnm = image.split('\\')[-1]
 
     if 'facecrop_' not in fnm:
-        facedata = "haarcascade.xml"
-        cascade = cv2.CascadeClassifier(facedata)
         minisize = (img.shape[1], img.shape[0])
         miniframe = cv2.resize(img, minisize)
-        faces = cascade.detectMultiScale(miniframe)
+        faces = facecascade.detectMultiScale(miniframe)
 
         for f in faces:
             x, y, w, h = [v for v in f]
@@ -151,27 +149,42 @@ def video_loop(camera):
         ret, frame = video.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = facecascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(30, 30))
-
+        people = []
+        
         for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
+            #cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
             recognize_image_pil = Image.fromarray(frame).convert('L')
             recognize_image = np.asarray(recognize_image_pil, 'uint8')
             person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])
-            cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y-8), 1, 1, (255, 255, 255))
+            people += [FACEID[FACEID.index(person_predicted)+1]]
+            cv2.putText(frame, FACEID[FACEID.index(person_predicted)+1], (x, y-16), 1, 1, (255, 255, 255))
 
         cv2.imshow('Video', frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('c') and len(people) > 0: # Save faces to imgaes
+            path = os.getcwd()+'/screenshot/'
+            if not os.path.isdir(path):
+                os.mkdir(path)
+                print('Creating /screenshot/ folder')
+
+            print("Captured image of " + ', '.join(people))
+            phototime = datetime.now()
+            filename = 'screenshot\\' + phototime.strftime('%Y%m%d_%H%M%S%f') + '.png'
+            cv2.imwrite(filename, frame)
+            face_crop(filename, True)
 
         if cv2.waitKey(1) & 0xFF == ord('q'): # Break code
             break
+
     video.release()
     cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
     #face_crop('people.jpg', False)
-    #crop_folder('cropping')
+    crop_folder('facedata')
     phototime = datetime.now()
-    update_database('faces' + phototime.strftime('%Y%m%d') + '.yaml')
-    #get_database('faces_20160803.yaml')
+    update_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
+    #get_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
     video_loop(0)
     print("Done")
