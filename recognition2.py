@@ -101,6 +101,7 @@ def crop_folder(folder):
 def update_database(filename):
     """
     :description: learn faces from pictures and save them to a file
+    :param filename: filename
     """
     i = 0
     for folder in os.walk('facedata'):
