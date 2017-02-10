@@ -1,3 +1,8 @@
+facedata/
+screenshot/
+.idea/
+.vs/
+
 *.pyproj
 *.sln
 *.suo
@@ -6,6 +11,3 @@
 *.jpg
 *.jpeg
 *.png
-facedata/
-.idea/
-.vs/
