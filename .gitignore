@@ -2,5 +2,10 @@
 *.sln
 *.suo
 *.db
-Database/Faris ElRayes/Thumbs.db
 *.yaml
+*.jpg
+*.jpeg
+*.png
+facedata/
+.idea/
+.vs/

@@ -181,10 +181,10 @@ def video_loop(camera):
 
 
 if __name__ == '__main__':
-    #face_crop('people.jpg', False)
-    crop_folder('facedata')
+    face_crop('screenshot\\a.jpg', False)
+    #crop_folder('facedata')
     phototime = datetime.now()
-    update_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
+    #update_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
     #get_database('faces_' + phototime.strftime('%Y%m%d') + '.yaml')
-    video_loop(0)
+    #video_loop(0)
     print("Done")
