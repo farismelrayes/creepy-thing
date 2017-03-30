@@ -86,6 +86,7 @@ def face_crop(image, remove):
         return True
     return False
 
+
 def crop_folder(folder):
     """
     :description: walks through folder and crops all photos to faces
@@ -95,6 +96,7 @@ def crop_folder(folder):
             for file in glob(folder[0]+'\\'+filetype):
                 if face_crop(file, True):
                     print(file)
+
 
 def update_database(filename):
     """
@@ -124,6 +126,7 @@ def update_database(filename):
     recognizer.train(IMAGES, np.array(LABELS))
     recognizer.save(filename)
 
+
 def get_database(filename):
     """
     :description: load faces from file
@@ -138,6 +141,7 @@ def get_database(filename):
             i += 1
     recognizer.load(filename)
 
+
 def video_loop(camera):
     """
     :description: run camera and look for faces
@@ -147,12 +151,12 @@ def video_loop(camera):
 
     while True:
         ret, frame = video.read()
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cv2tColor(frame, cv2.COLOR_BGR2GRAY)
         faces = facecascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(30, 30))
         people = []
         
         for (x, y, w, h) in faces:
-            #cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
+            #cv22.rectangle(frame, (x, y), (x+w, y+h), (255, 255, 0), 2)
             recognize_image_pil = Image.fromarray(frame).convert('L')
             recognize_image = np.asarray(recognize_image_pil, 'uint8')
             person_predicted = recognizer.predict(recognize_image[y: y + h, x: x + w])
