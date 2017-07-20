@@ -1,3 +1,13 @@
+facedata/
+screenshot/
+.idea/
+.vs/
+
 *.pyproj
 *.sln
 *.suo
+*.db
+*.yaml
+*.jpg
+*.jpeg
+*.png
